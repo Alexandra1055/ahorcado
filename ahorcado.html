@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+
+</body>
+<script>
+
+    const IMAGENES = ["img/1.png", "img/2.png", "img/3.png", "img/4.png", "img/5.png", "img/6.png", "img/7.png"];
+
+    const PALABRAS = ["CIUDAD", "FAMILIA", "AMIGO", "AMIGA", "AMOR", "SALUD", "DINERO", "PROBLEMA", "SOLUCION", "PREGUNTA", "RESPUESTA", "HISTORIA", "LUGAR", "MUSICA", "PELICULA", "LIBRO", "ESCUELA", "UNIVERSIDAD", "COCHE", "ORDENADOR", "TELEFONO", "INTERNET", "PERRO", "GATO", "ARBOL", "AGUA", "FUEGO", "TIERRA", "AIRE", "COMIDA", "BEBIDA", "PAN", "LECHE", "QUESO", "HUEVO", "FRUTA", "VERDURA", "PLAYA", "MONTANA", "RIO", "MAR", "SOL", "LUNA", "ESTRELLA", "CALLE", "PLAZA", "BARRIO", "PUEBLO", "CAMPO", "CARRETERA", "TRAFICO", "AVION", "TREN", "BARCO", "AUTOBUS", "BICICLETA", "MAQUINA", "HERRAMIENTA", "PROYECTO", "EMPRESA", "NEGOCIO", "CLIENTE", "USUARIO", "SERVICIO", "PRODUCTO", "SISTEMA", "DATO", "DATOS",
+        "GRANDE", "PEQUENO", "NUEVO", "VIEJO", "BUENO", "MALO", "BONITO", "FEO", "FACIL", "DIFICIL", "RAPIDO", "LENTO", "FRIO", "CALIENTE", "ALTO", "BAJO", "LARGO", "CORTO", "CLARO", "OSCURO", "CARO", "BARATO", "FELIZ", "TRISTE", "FUERTE", "DEBIL", "LIBRE", "OCUPADO", "TRANQUILO", "NERVIOSO", "INTERESANTE", "IMPORTANTE", "PUBLICO", "PRIVADO", "GENERAL", "ESPECIAL", "CORRECTO", "INCORRECTO", "POSIBLE", "IMPOSIBLE", "REAL", "FALSO", "UTIL", "INUTIL",
+        "ROJO", "AZUL", "VERDE", "AMARILLO", "NEGRO", "BLANCO", "GRIS", "NARANJA", "MORADO", "ROSA", "MARRON", "TURQUESA", "VIOLETA",
+        "LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO", "DOMINGO"];
+
+    const ABECEDARIO = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+
+    function CrearPartida() {
+        const divPrincipal = document.createElement("div");
+        let error = 0;
+
+        const titulo = document.createElement("h1");
+        titulo.textContent = "Juego del Ahorcado";
+        divPrincipal.appendChild(titulo);
+
+        const divIMG = document.createElement("div");
+        divPrincipal.appendChild(divIMG);
+
+
+
+        const divBotones = document.createElement("div");
+        for (let b = 0; b < ABECEDARIO.length; b++) {
+            const boton = document.createElement("button");
+            const letra = ABECEDARIO[b];
+            boton.textContent = letra;
+            divBotones.appendChild(boton);
+            boton.addEventListener('click', () => revelarLetra(letra, boton));
+        }
+
+        divPrincipal.appendChild(divBotones);
+        document.body.appendChild(divPrincipal);
+
+
+        const palabra = document.createElement("p");
+        palabra.id = "palabraSecreta";
+        divPrincipal.appendChild(palabra);
+
+        const mensajeFinal = document.createElement("p");
+        divPrincipal.appendChild(mensajeFinal);
+
+        let palabraSecreta = "";
+        let letrasDestapadas = [];
+
+
+        function palabraRandom() {
+            const posicionRandom = Math.floor(Math.random() * PALABRAS.length);
+            palabraSecreta = PALABRAS[posicionRandom];
+            return palabraSecreta;
+        }
+
+        function palabraTapada() {
+            let palabraGuines = "";
+            for (let i = 0; i < palabraSecreta.length; i++) {
+                const usarLetra = palabraSecreta[i];
+                if (letrasDestapadas.includes(usarLetra)) {
+                    palabraGuines += ` ${usarLetra} `;
+                } else {
+                    palabraGuines += " _ ";
+                }
+            }
+            document.querySelector("#palabraSecreta").textContent = palabraGuines.trim();
+        }
+
+        function revelarLetra(letra, boton) {
+            let acierto = false;
+
+            for (let i = 0; i < palabraSecreta.length; i++) {
+
+                if (palabraSecreta[i] === letra) {
+                    if (!letrasDestapadas.includes(letra)) {
+                        letrasDestapadas.push(letra);
+                    }
+                    acierto = true;
+                }
+            }
+
+            if (acierto) {
+                boton.textContent = letra;
+                boton.style.backgroundColor = "#2e7d32";
+                boton.disabled = true;
+                palabraTapada();
+                if (!document.querySelector("#palabraSecreta").textContent.includes('_')) {
+                    mensajeFinal.textContent = `¡Has ganado! La palabra era ${palabraSecreta}`;
+                    reiniciar();
+                    return;
+                }
+
+            } else {
+                boton.textContent = letra;
+                boton.style.backgroundColor = "#c62828";
+                boton.disabled = true;
+                error++;
+                cambiarIMG(error);
+                if (error >= IMAGENES.length - 1) {
+                    mensajeFinal.textContent = `Has perdido. La palabra era ${palabraSecreta}`;
+                    reiniciar();
+                    return;
+                }
+            }
+        }
+
+        function reiniciar() {
+            const reiniciarBtn = document.createElement("button");
+            reiniciarBtn.id = "reiniciar";
+            reiniciarBtn.textContent = "Reiniciar Partida";
+            reiniciarBtn.addEventListener('click', function () {
+                document.body.innerHTML = "";
+                CrearPartida();
+            });
+
+            document.body.appendChild(reiniciarBtn);
+        }
+
+        function cambiarIMG(errorActual) {
+            divIMG.innerHTML = '';
+            for (let i = 0; i < IMAGENES.length; i++) {
+                const imagen = document.createElement("img");
+                imagen.src = IMAGENES[i];
+                imagen.alt = "imagen ahoracado";
+                if (errorActual !== i) {
+                    imagen.style.display = 'none';
+                }
+                divIMG.appendChild(imagen);
+            }
+
+        }
+
+
+        palabraRandom();
+        cambiarIMG(error);
+        palabraTapada();
+    }
+
+
+    function init() {
+        CrearPartida();
+    }
+
+    init();
+
+</script>
+
+</html>
